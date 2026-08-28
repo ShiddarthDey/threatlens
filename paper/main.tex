@@ -58,13 +58,13 @@ that are simply \emph{unverifiable} because no authority can confirm them.
 
 We evaluate five open-weight models on 94 CISA advisories published after the
 models' training cutoffs, plus two indicator-list CTI events. Four findings
-emerge. (i)~Hallucination is task-dependent rather than model-intrinsic: the
-same model scores $0.00\%$ on indicator-copying tasks and $6.39\%$ on narrative
+emerge. (i)~Hallucination is task-dependent rather than model-intrinsic: Nemotron-3-Super 120B
+scores $0.00\%$ [95\% CI: $0.00\%, 0.52\%$] on indicator-copying tasks and $6.39\%$ [$4.65\%, 8.73\%$] on narrative
 advisories requiring inference. (ii)~Precision metrics conceal
-\emph{silent failure}: one model returned well-formed but empty extractions on
-$100\%$ of its successful runs over CVE-bearing advisories, which a
-precision-only benchmark would report as flawless. Even the best model silently
-returns nothing on $11.2\%$ of CVE-bearing advisories. (iii)~Two reproducible
+\emph{silent failure}: Nemotron-3-nano 30B returned well-formed but empty extractions on
+$100.0\%$ [$72.2\%, 100.0\%$] of its successful runs over CVE-bearing advisories, which a
+precision-only benchmark would report as flawless. Even Nemotron-3-Super 120B silently
+returns nothing on $11.2\%$ [$7.0\%, 17.4\%$] of CVE-bearing advisories. (iii)~Two reproducible
 failure modes appear at temperature~0: parametric-memory CVE imports and
 systematic ATT\&CK sub-technique confabulation. (iv)~Following NIST's April 2026
 decision to abandon universal NVD enrichment, existence checking against
@@ -255,10 +255,8 @@ secondary corpus of two TLP:WHITE CIRCL MISP OSINT events \cite{circlfeed}
 3{,}754 characters) provides an indicator-copying contrast condition.
 
 \paragraph{Models.}
-We attempted twelve open-weight endpoints; five produced usable output
-(Table~\ref{tab:main}). Seven produced none because of persistent upstream
-rate limiting or endpoint withdrawal---a result we report rather than hide
-(Section~\ref{sec:limits}).
+We attempted twelve open-weight endpoints via OpenRouter's API \cite{openrouter}; five produced usable output
+(Table~\ref{tab:main}): \texttt{nvidia/nemotron-3-super-120b-a12b:free}, \texttt{openai/gpt-oss-20b:free}, \texttt{google/gemma-4-31b-it:free}, \texttt{nvidia/nemotron-nano-9b-v2:free}, and \texttt{nvidia/nemotron-3-nano-30b-a3b:free} (evaluated between June 12 and July 25, 2026). Seven endpoints produced no usable extractions due to persistent upstream HTTP 429 rate-limiting or endpoint withdrawal---a constraint we report rather than hide (Section~\ref{sec:limits}).
 
 \paragraph{Protocol.}
 Temperature~0, fixed prompt, up to three runs per report per model. Claims are
@@ -275,29 +273,29 @@ negative control on every re-verification.
 \caption{Grounding verdicts by model and corpus. \textsc{Cisa} = narrative
 advisories (inference required); \textsc{Misp} = indicator lists (copying).
 Hallucination rate $=$ (fabricated $+$ ungrounded $+$ mislabeled) $/$
-verifiable claims.}
+verifiable claims, reported with Wilson 95\% CIs.}
 \label{tab:main}
-\begin{tabular}{llrrr}
+\begin{tabular}{llrrrr}
 \toprule
-Model & Corpus & Runs & Claims & Halluc. \\
+Model & Corpus & Runs & Claims & Halluc. Rate & 95\% CI \\
 \midrule
-Nemotron-3-Super 120B & \textsc{misp} & 6   & 739 & \bf 0.00\% \\
-Nemotron-3-Super 120B & \textsc{cisa} & 143 & 590 & \bf 6.39\% \\
-gpt-oss-20B           & \textsc{misp} & 1   & 42  & \bf 0.00\% \\
-gpt-oss-20B           & \textsc{cisa} & 39  & 113 & \bf 23.71\% \\
-Gemma-4 31B           & \textsc{misp} & 1   & 39  & 0.00\% \\
-Nemotron-nano 9B      & \textsc{cisa} & 5   & 7   & 0.00\% \\
-Nemotron-3-nano 30B   & \textsc{cisa} & 10  & 0   & --- \\
+Nemotron-3-Super 120B & \textsc{misp} & 6   & 739 & \bf 0.00\% & [0.00\%, 0.52\%] \\
+Nemotron-3-Super 120B & \textsc{cisa} & 143 & 590 & \bf 6.39\% & [4.65\%, 8.73\%] \\
+gpt-oss-20B           & \textsc{misp} & 1   & 42  & \bf 0.00\% & [0.00\%, 8.38\%] \\
+gpt-oss-20B           & \textsc{cisa} & 39  & 113 & \bf 23.71\% & [16.35\%, 33.07\%] \\
+Gemma-4 31B           & \textsc{misp} & 1   & 39  & 0.00\% & [0.00\%, 8.97\%] \\
+Nemotron-nano 9B      & \textsc{cisa} & 5   & 7   & 0.00\% & [0.00\%, 35.43\%] \\
+Nemotron-3-nano 30B   & \textsc{cisa} & 10  & 0   & --- & --- \\
 \midrule
-Negative control      & \textsc{misp} & 1   & 8   & 87.50\% \\
+Negative control      & \textsc{misp} & 1   & 8   & 87.50\% & [52.91\%, 97.76\%] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Hallucination is task-dependent}
 Table~\ref{tab:main} shows the same model, prompt and verifier producing
-$0.00\%$ hallucination on indicator-list events and $6.39\%$ on narrative
-advisories (Nemotron-120B), and $0.00\%$ versus $23.71\%$ for gpt-oss-20B. The
+$0.00\%$ [95\% CI: $0.00\%, 0.52\%$] hallucination on indicator-list events and $6.39\%$ [$4.65\%, 8.73\%$] on narrative
+advisories for Nemotron-3-Super 120B, and $0.00\%$ [$0.00\%, 8.38\%$] versus $23.71\%$ [$16.35\%, 33.07\%$] for gpt-oss-20B. The
 distinction is not report length but task type: indicator lists require
 copying, whereas advisories require inferring techniques and mapping products,
 and inference is where grounding fails. A benchmark composed mainly of
@@ -308,34 +306,32 @@ transfer to the narrative reports analysts actually triage.
 \label{sec:silent}
 
 \begin{table}[t]
-\centering\small
-\caption{Yield analysis over CVE-bearing advisories. \emph{Silent failure} =
-well-formed but empty extraction from a report that does contain CVEs;
+\centering\footnotesize
+\caption{Yield analysis over CVE-bearing advisories with Wilson 95\% CIs. \emph{Silent failure} =
+well-formed but empty extraction from a report containing CVEs;
 \emph{abstention} = empty extraction from a report with none.}
 \label{tab:silent}
 \begin{tabular}{lrrrr}
 \toprule
-Model & Runs & Yield & Silent & Abstain \\
+Model & Runs & Yield [95\% CI] & Silent [95\% CI] & Abstain [95\% CI] \\
 \midrule
-Nemotron-3-Super 120B & 143 & 86.7\% & \bf 11.2\% & 2.1\% \\
-gpt-oss-20B           & 39  & 97.4\% & 2.6\%      & 0.0\% \\
-Nemotron-nano 9B      & 5   & 80.0\% & 0.0\%      & 20.0\% \\
-Nemotron-3-nano 30B   & 10  & 0.0\%  & \bf 100\%  & 0.0\% \\
+Nemotron-3-Super 120B & 143 & 86.7\% [80.2\%, 91.3\%] & \bf 11.2\% [7.0\%, 17.4\%] & 2.1\% [0.7\%, 6.0\%] \\
+gpt-oss-20B           & 39  & 97.4\% [86.8\%, 99.5\%] & 2.6\% [0.5\%, 13.2\%]     & 0.0\% [0.0\%, 9.0\%] \\
+Nemotron-nano 9B      & 5   & 80.0\% [37.6\%, 96.4\%] & 0.0\% [0.0\%, 43.4\%]    & 20.0\% [3.6\%, 62.4\%] \\
+Nemotron-3-nano 30B   & 10  & 0.0\% [0.0\%, 27.8\%]   & \bf 100.0\% [72.2\%, 100.0\%] & 0.0\% [0.0\%, 27.8\%] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Nemotron-3-nano 30B returned syntactically valid JSON containing empty arrays
-on \emph{every} successful run. Its hallucination rate is undefined because it
+on \emph{every} successful run ($100.0\%$ [95\% CI: $72.2\%, 100.0\%$]). Its hallucination rate is undefined because it
 made no claims; a precision-only benchmark would report it as making no errors.
 Table~\ref{tab:silent} separates this from legitimate abstention by asking
-whether the source document contained CVE identifiers at all. All ten of the
-30B model's empty runs were on advisories that did contain CVEs---up to seven
+whether the source document contained CVE identifiers at all. All ten of Nemotron-3-nano 30B's empty runs were on advisories that did contain CVEs---up to seven
 in one case---so they are unambiguous failures, not appropriate silence.
 
-The result generalises beyond the smallest models: the best-performing model
-in our study silently returns nothing on $11.2\%$ of CVE-bearing advisories
-while reporting an excellent $6.39\%$ hallucination rate. In an automated
+The result generalises beyond the smallest models: the best-performing model in our study, Nemotron-3-Super 120B, silently returns nothing on $11.2\%$ [$7.0\%, 17.4\%$] of CVE-bearing advisories
+while reporting an excellent $6.39\%$ [$4.65\%, 8.73\%$] hallucination rate. In an automated
 defence pipeline a silently dropped advisory is arguably more dangerous than a
 visible error, because nothing signals that review is needed. We therefore
 argue that \emph{yield} and \emph{silent-failure rate} must be reported
@@ -371,7 +367,7 @@ same-week ICS advisories, 9 of 11 CVEs quoted \emph{verbatim} in the advisory
 text were present in neither NVD nor CVE.org, while the remaining two resolved
 normally. A naive verifier flags all nine as fabrications. The correct verdict
 is \textsc{Unverifiable}: the model was faithful, and the registries were
-merely behind. Over the full study, 27 claims from the 120B model were
+merely behind. Over the full study, 27 claims from Nemotron-3-Super 120B were
 quarantined this way. Existence checking against vulnerability registries thus
 degrades exactly on the freshest---and most operationally urgent---advisories,
 which we believe is an under-appreciated constraint on automated CTI validation
@@ -406,8 +402,8 @@ tests (23 tests at time of writing):
       incidentally yields a dataset of supply-chain vulnerability cases.
 \end{enumerate}
 
-Before these fixes the measured hallucination rate for the 120B model was
-$17.5\%$; after adjudication it is $6.39\%$ on the same data. The difference is
+Before these fixes the measured hallucination rate for Nemotron-3-Super 120B was
+$17.5\%$; after adjudication it is $6.39\%$ [$4.65\%, 8.73\%$] on the same data. The difference is
 entirely verifier error. We report this trajectory deliberately: any automated
 CTI evaluation that has not published such an audit should be assumed to
 contain false positives of similar magnitude.
@@ -437,9 +433,7 @@ Our study is preliminary in scale and we state its bounds plainly.
 The corpus is 94 advisories dominated by ICS bulletins from a single publisher;
 adversary-narrative reports from vendor research would exercise actor and
 technique extraction more heavily. Sample sizes are unequal and small for three
-of five models (5--39 successful runs), so their point estimates should be
-treated as indicative only; only the 120B model has enough data for confident
-claims. Model availability, not compute, was the binding constraint: across the
+of five models (5--39 successful runs), resulting in wide Wilson 95\% confidence intervals (e.g., $0.00\%$ [$0.00\%, 35.43\%$] for Nemotron-nano 9B and $23.71\%$ [$16.35\%, 33.07\%$] for gpt-oss-20B); only Nemotron-3-Super 120B has sufficient sample size ($n=563$ verifiable claims, 95\% CI [$4.65\%, 8.73\%$]) for tight point estimation. Model availability, not compute, was the binding constraint: across the
 study we recorded 305 dropped connections and roughly 120 rate-limit rejections
 on free endpoints, and 7 of 12 attempted models produced no usable output at
 all. Reproducibility of free-tier evaluation is therefore poor, and we
