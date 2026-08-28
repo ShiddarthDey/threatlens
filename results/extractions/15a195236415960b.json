@@ -1,0 +1,29 @@
+{
+  "summary": "A CIRCL OSINT event covering PassiveTotal research on the Turla espionage group, which chains SSL certificate fingerprints with dynamic-DNS infrastructure. The event lists C2 hostnames on free dynamic-DNS providers, associated IP addresses, and one X.509 certificate SHA1 fingerprint attributed to Turla.",
+  "cves": [],
+  "iocs": [
+    {"type": "domain", "value": "trytowin.ignorelist.com", "evidence": "hostname: trytowin.ignorelist.com"},
+    {"type": "domain", "value": "treesofter.mooo.com", "evidence": "hostname: treesofter.mooo.com"},
+    {"type": "domain", "value": "sportinfo.yourtrap.com", "evidence": "hostname: sportinfo.yourtrap.com"},
+    {"type": "domain", "value": "profound.zzux.com", "evidence": "hostname: profound.zzux.com"},
+    {"type": "domain", "value": "badget.ignorelist.com", "evidence": "hostname: badget.ignorelist.com"},
+    {"type": "domain", "value": "norwaynews.mooo.com", "evidence": "hostname: norwaynews.mooo.com"},
+    {"type": "domain", "value": "dellservice.publicvm.com", "evidence": "hostname: dellservice.publicvm.com"},
+    {"type": "domain", "value": "priceline.publicvm.com", "evidence": "hostname: priceline.publicvm.com"},
+    {"type": "domain", "value": "forumgeek.zzux.com", "evidence": "hostname: forumgeek.zzux.com"},
+    {"type": "domain", "value": "mouses.strangled.net", "evidence": "hostname: mouses.strangled.net"},
+    {"type": "ip", "value": "209.239.79.69", "evidence": "ip-dst: 209.239.79.69"},
+    {"type": "ip", "value": "82.146.174.240", "evidence": "ip-dst: 82.146.174.240"},
+    {"type": "ip", "value": "82.146.166.61", "evidence": "ip-dst: 82.146.166.61"},
+    {"type": "ip", "value": "193.220.55.6", "evidence": "ip-dst: 193.220.55.6"},
+    {"type": "ip", "value": "83.229.62.212", "evidence": "ip-dst: 83.229.62.212"},
+    {"type": "hash", "value": "f415844680ed9118ea74e0c7712b35044f0cc20d", "evidence": "x509-fingerprint-sha1: f415844680ed9118ea74e0c7712b35044f0cc20d"}
+  ],
+  "attack_techniques": [
+    {"id": "T1588.004", "name": "Digital Certificates", "evidence": "OSINT - Turla - Harnessing SSL Certificates Using Infrastructure Chaining"}
+  ],
+  "threat_actors": [
+    {"name": "Turla", "evidence": "threat-actor: Turla"}
+  ],
+  "malware": []
+}

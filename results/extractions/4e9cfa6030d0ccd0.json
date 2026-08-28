@@ -1,0 +1,29 @@
+{
+  "summary": "A CIRCL OSINT event for Cylance's Operation Dust Storm research, a multi-year campaign targeting Japanese critical infrastructure. The event provides command-and-control IP addresses and a large set of C2 hostnames across attacker-registered domains and dynamic-DNS services.",
+  "cves": [],
+  "iocs": [
+    {"type": "ip", "value": "218.106.246.195", "evidence": "ip-dst: 218.106.246.195"},
+    {"type": "ip", "value": "218.106.246.220", "evidence": "ip-dst: 218.106.246.220"},
+    {"type": "ip", "value": "111.67.199.213", "evidence": "ip-dst: 111.67.199.213"},
+    {"type": "ip", "value": "125.46.42.221", "evidence": "ip-dst: 125.46.42.221"},
+    {"type": "ip", "value": "113.11.202.233", "evidence": "ip-dst: 113.11.202.233"},
+    {"type": "ip", "value": "173.252.201.210", "evidence": "ip-dst: 173.252.201.210"},
+    {"type": "ip", "value": "59.188.13.133", "evidence": "ip-dst: 59.188.13.133"},
+    {"type": "ip", "value": "59.188.13.137", "evidence": "ip-dst: 59.188.13.137"},
+    {"type": "domain", "value": "adobekr.com", "evidence": "hostname: adobekr.com"},
+    {"type": "domain", "value": "adobeus.com", "evidence": "hostname: adobeus.com"},
+    {"type": "domain", "value": "amazonwikis.com", "evidence": "hostname: amazonwikis.com"},
+    {"type": "domain", "value": "sfcorporation.com", "evidence": "hostname: sfcorporation.com"},
+    {"type": "domain", "value": "wordoscorp.com", "evidence": "hostname: wordoscorp.com"},
+    {"type": "domain", "value": "tomshardpc.com", "evidence": "hostname: tomshardpc.com"},
+    {"type": "domain", "value": "moviestops.com", "evidence": "hostname: moviestops.com"},
+    {"type": "domain", "value": "login.live.adobekr.com", "evidence": "hostname: login.live.adobekr.com"},
+    {"type": "domain", "value": "msejake.7766.org", "evidence": "hostname: msejake.7766.org"},
+    {"type": "domain", "value": "vpntemp.3322.org", "evidence": "hostname: vpntemp.3322.org"}
+  ],
+  "attack_techniques": [],
+  "threat_actors": [
+    {"name": "Dust Storm", "evidence": "campaign-name: Dust Storm"}
+  ],
+  "malware": []
+}

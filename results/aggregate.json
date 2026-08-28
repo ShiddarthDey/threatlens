@@ -1,0 +1,24 @@
+{
+  "claude-fable-5/manual-demo": {
+    "claims": 37,
+    "verdicts": {
+      "verified": 37
+    },
+    "runs": 2,
+    "errors": 0,
+    "hallucination_rate": 0.0
+  },
+  "negative-control(injected-errors)": {
+    "claims": 8,
+    "verdicts": {
+      "ungrounded": 2,
+      "unverifiable": 1,
+      "fabricated": 3,
+      "verified": 1,
+      "mislabeled": 1
+    },
+    "runs": 1,
+    "errors": 0,
+    "hallucination_rate": 0.8571
+  }
+}

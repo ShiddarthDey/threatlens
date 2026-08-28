@@ -1,0 +1,21 @@
+{
+  "_note": "NEGATIVE CONTROL - deliberately corrupted extraction to validate verifier discrimination. NOT a real model output. Each error type is injected on purpose.",
+  "summary": "Synthetic perturbation of the Turla event extraction.",
+  "cves": [
+    {"id": "CVE-2021-44228", "product": "Apache Log4j2", "evidence": "not mentioned anywhere in the source event"},
+    {"id": "CVE-2016-99999", "product": null, "evidence": "fabricated id"}
+  ],
+  "iocs": [
+    {"type": "ip", "value": "198.51.100.99", "evidence": "not present in source"},
+    {"type": "ip", "value": "999.999.1.1", "evidence": "malformed"},
+    {"type": "domain", "value": "trytowin.ignorelist.com", "evidence": "hostname: trytowin.ignorelist.com"}
+  ],
+  "attack_techniques": [
+    {"id": "T9999", "name": "Quantum Exfiltration", "evidence": "invalid id"},
+    {"id": "T1566.001", "name": "Process Injection", "evidence": "wrong name for valid id"}
+  ],
+  "threat_actors": [
+    {"name": "Purple Walrus Group", "evidence": "fabricated actor"}
+  ],
+  "malware": []
+}
