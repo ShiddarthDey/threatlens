@@ -17,11 +17,14 @@
 \usepackage{times}
 \usepackage{booktabs}
 \usepackage{amsmath}
-\usepackage{url}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{microtype}
+\usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
 \usepackage{balance}
+
+\emergencystretch=1.5em
 
 \lstset{basicstyle=\ttfamily\scriptsize, breaklines=true, frame=single,
         columns=fullflexible, xleftmargin=2pt, framexleftmargin=2pt}
@@ -256,7 +259,7 @@ secondary corpus of two TLP:WHITE CIRCL MISP OSINT events \cite{circlfeed}
 
 \paragraph{Models.}
 We attempted twelve open-weight endpoints via OpenRouter's API \cite{openrouter}; five produced usable output
-(Table~\ref{tab:main}): \texttt{nvidia/nemotron-3-super-120b-a12b:free}, \texttt{openai/gpt-oss-20b:free}, \texttt{google/gemma-4-31b-it:free}, \texttt{nvidia/nemotron-nano-9b-v2:free}, and \texttt{nvidia/nemotron-3-nano-30b-a3b:free} (evaluated between June 12 and July 25, 2026). Seven endpoints produced no usable extractions due to persistent upstream HTTP 429 rate-limiting or endpoint withdrawal---a constraint we report rather than hide (Section~\ref{sec:limits}).
+(Table~\ref{tab:main}): \path{nvidia/nemotron-3-super-120b-a12b:free}, \path{openai/gpt-oss-20b:free}, \path{google/gemma-4-31b-it:free}, \path{nvidia/nemotron-nano-9b-v2:free}, and \path{nvidia/nemotron-3-nano-30b-a3b:free} (evaluated between June 12 and July 25, 2026). Seven endpoints produced no usable extractions due to persistent upstream HTTP 429 rate-limiting or endpoint withdrawal---a constraint we report rather than hide (Section~\ref{sec:limits}).
 
 \paragraph{Protocol.}
 Temperature~0, fixed prompt, up to three runs per report per model. Claims are
@@ -275,6 +278,7 @@ advisories (inference required); \textsc{Misp} = indicator lists (copying).
 Hallucination rate $=$ (fabricated $+$ ungrounded $+$ mislabeled) $/$
 verifiable claims, reported with Wilson 95\% CIs.}
 \label{tab:main}
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{llrrrr}
 \toprule
 Model & Corpus & Runs & Claims & Halluc. Rate & 95\% CI \\
@@ -311,6 +315,7 @@ transfer to the narrative reports analysts actually triage.
 well-formed but empty extraction from a report containing CVEs;
 \emph{abstention} = empty extraction from a report with none.}
 \label{tab:silent}
+\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{lrrrr}
 \toprule
 Model & Runs & Yield [95\% CI] & Silent [95\% CI] & Abstain [95\% CI] \\
@@ -456,7 +461,7 @@ retrieval-augmented variants are unexplored.
 sources, the corpus manifest with publication dates, per-claim verdict records,
 the regression test suite, and the re-verification tool that reproduces every
 number in this paper from stored extractions without re-invoking any model.
-\begin{center}\small\url{https://github.com/ShiddarthDey/threatlens}\end{center}
+\begin{center}\small\url{https://github.com/ShiddarthDey/threatlense}\end{center}
 
 \balance
 \bibliographystyle{plain}
