@@ -72,7 +72,7 @@ python scripts/wilson_intervals.py
 python scripts/analyze.py
 ```
 
-*Note: The stored evaluation file `results/results_reverified.jsonl` includes a `claude-fable-5/manual-demo` row, which was created during initial pipeline setup as a manual demonstration artifact and is not one of the five evaluated open-weight models.*
+*Note: The stored evaluation file `results/results_reverified.jsonl` includes a `claude-fable-5/manual-demo` row, which was created during initial pipeline setup as a manual demonstration artifact and is not one of the five evaluated open-weight models. Note also that the paper's Table 2 figures are the per-corpus CISA rows output by `scripts/silent_failure.py`.*
 
 ## Run Pipeline
 
