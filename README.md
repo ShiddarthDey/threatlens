@@ -1,131 +1,71 @@
 # ThreatLens
 
-LLM-powered cyber threat intelligence (CTI) extraction with **claim-level
-hallucination verification** against authoritative sources: NVD, MITRE ATT&CK
-STIX 2.1, and source-document provenance.
+**Claim-level grounding verification for LLM-extracted cyber threat intelligence.**
 
-See `RESEARCH.md` for the verified literature review, gap analysis, hallucination
-taxonomy, and the experimental design for the paper.
+ThreatLens verifies every atomic claim an LLM extracts from a threat report — CVEs, indicators of compromise, ATT&CK techniques, threat actors, malware — against the authorities operational security already trusts: the NVD API, CVE.org CNA records, the MITRE ATT&CK STIX bundle, and the source document itself. Deterministic, at extraction time, with no human in the loop.
 
-## What it does
+## Why not accuracy benchmarks?
 
-```
-real reports (CISA / OTX / MISP)
-        │
-        ▼
-LLM extraction (Ollama: Llama 3 / Mistral / Qwen, or any OpenAI-compatible API)
-   → atomic claims: CVEs, IoCs, ATT&CK techniques, actors, malware
-        │
-        ▼
-Deterministic verifier → per-claim verdict:
-   FABRICATED   entity doesn't exist (CVE not in NVD, invalid ATT&CK ID, ...)
-   UNGROUNDED   real entity the source never mentions (parametric import)
-   MISLABELED   real + grounded, but wrong metadata (ID↔name mismatch, ...)
-   VERIFIED     exists + grounded + consistent
-   UNVERIFIABLE authority unavailable (API down) — never guessed
-        │
-        ▼
-results/results.jsonl + per-model hallucination metrics
-```
+Answer-key benchmarks score model output against static gold labels and report precision-style aggregates. ThreatLens reframes evaluation as *grounding*: each claim receives exactly one verdict —
 
-## Quickstart
+| Verdict | Meaning |
+|---|---|
+| `VERIFIED` | Exists in an authority, grounded in the source, metadata consistent |
+| `FABRICATED` | Does not exist in any authority and is absent from the source |
+| `UNGROUNDED` | Real entity, but the source never states it (parametric-memory import) |
+| `MISLABELED` | Real and grounded, but attached metadata is wrong |
+| `UNVERIFIABLE` | No authority can adjudicate (fail-safe state, not a failure) |
 
-### 1. Installation
+The `UNGROUNDED`/`FABRICATED` split is the taxonomy's key contribution: a real CVE the source never mentions is not an invented fact, but it is equally unsafe in an automated pipeline.
 
-```bash
-python -m venv .venv && .venv\Scripts\activate   # Windows (.venv/bin/activate on Linux/macOS)
-pip install -r requirements.txt
-python scripts/download_attack.py                 # ATT&CK STIX bundle (~50 MB)
-```
+## Key findings (paper §5)
 
-### 2. API Key Configuration
+Evaluation on **94 post-cutoff CISA advisories** (June–July 2026, 280 distinct CVEs) plus two MISP indicator-list events, across five open-weight models:
 
-Copy `.env.example` to `.env` and add your API keys (all free tier):
+- **Hallucination is task-dependent, not model-intrinsic.** Nemotron-3-Super 120B: 0.00% [95% CI 0.00–0.52] on indicator copying vs 6.39% [4.65–8.73] on narrative advisories.
+- **Precision metrics conceal silent failure.** Nemotron-3-nano 30B returned well-formed *empty* extractions on 100.0% [72.2–100.0] of CVE-bearing advisories; even the 120B model silently drops 11.2% [7.0–17.4].
+- **Two reproducible failure modes at temperature 0:** parametric-memory CVE imports and systematic ATT&CK sub-technique confabulation.
+- **Registry lag defeats existence checking.** After NIST's April 2026 NVD enrichment curtailment, 9 of 11 verbatim-quoted CVEs in same-week ICS advisories were absent from both NVD and CVE.org.
 
-```bash
-copy .env.example .env                            # Windows (cp .env.example .env on Linux/macOS)
-```
+## The verifier audits itself
 
-In `.env`, configure:
-- `LLM_BASE_URL` & `LLM_API_KEY`: For hosted OpenAI-compatible APIs (OpenRouter, Groq, etc.). Default is local Ollama (`http://localhost:11434`), which requires no key.
-- `OTX_API_KEY`: Free key from AlienVault OTX (required only for `--source otx`).
-- `NVD_API_KEY`: Free NVD key to raise rate limits from 5 to 50 req/30s (optional).
+Every flagged claim was adjudicated by hand; five verifier false-positive classes were found, fixed, and pinned by regression tests (23 tests). Before these fixes the measured hallucination rate was 17.5%; after, 6.39% on identical data — the difference is entirely verifier error, which is why the audit trail ships as a first-class artifact.
 
-### 3. Reproducing Paper Numbers Offline (No LLM / Network required)
-
-To reproduce the paper's hallucination rates, silent failure rates, and Wilson 95% score confidence intervals directly from pre-produced extraction records:
-
-```bash
-# Run offline regression unit tests
-python -m pytest tests/ -v
-
-# Re-verify stored extractions & produce results/results_reverified.jsonl
-python scripts/reverify.py
-
-# Compute silent failure rates (CVE-bearing vs abstention)
-python scripts/silent_failure.py results/results_reverified.jsonl
-
-# Compute exact Wilson 95% confidence intervals for paper tables
-python scripts/wilson_intervals.py
-
-# Analyze per-model IoC recall & run-to-run consistency
-python scripts/analyze.py
-```
-
-*Note: The stored evaluation file `results/results_reverified.jsonl` includes a `claude-fable-5/manual-demo` row, which was created during initial pipeline setup as a manual demonstration artifact and is not one of the five evaluated open-weight models. Note also that the paper's Table 2 figures are the per-corpus CISA rows output by `scripts/silent_failure.py`.*
-
-## Run Pipeline
-
-```bash
-# real pipeline: 5 CISA advisories, 1 model
-python run.py pipeline --source cisa --limit 5 --models llama3:8b
-
-# consistency experiment: 3 runs per report, 2 models
-python run.py pipeline --source cisa --limit 20 --runs 3 --models llama3:8b mistral:7b
-
-# build the corpus incrementally (no LLM calls; dedups by advisory ID —
-# run every few days to accumulate ~100 post-cutoff reports)
-python run.py ingest --source cisa --limit 100
-
-# run models over a corpus; resumes automatically after rate-limit failures
-python run.py corpus --corpus results/corpus_cisa.jsonl --models nvidia/nemotron-3-super-120b-a12b:free --runs 3 --delay 5
-
-# aggregate results
-python run.py aggregate
-```
-
-## Layout
+## Repository layout
 
 ```
-threatlens/
-  schema.py       data model, 5-way verdict taxonomy, IoC regexes, refang()
-  ingest.py       CISA RSS + OTX pulses (real data only)
-  ingest_misp.py  CIRCL / botvrij MISP OSINT feeds (license-clean corpus)
-  llm.py          Ollama / OpenAI-compatible client (no LangChain — fewer deps)
-  extract.py      structured extraction prompt + strict JSON parsing
-  attack.py       ATT&CK KB: full STIX bundle, or compact fallback
-  nvd.py          NVD API 2.0 client w/ disk cache + rate limiting
-  verify.py       the hallucination detector (core contribution)
-  pipeline.py     orchestration, JSONL persistence, aggregation
+src/ or threatlens/     # Verifier, ingestion (CISA + MISP), provenance checks
 scripts/
-  download_attack.py    full STIX bundle (~50 MB, preferred KB)
-  build_compact_kb.py   fallback KB from PyPI attack-stix-lookup (v18.1)
-  build_demo_corpus.py  reconstructs the demo corpus (see RUN_NOTES.md)
-  run_offline.py        verify pre-produced extraction JSONs
-  reverify.py           re-verify stored extractions offline
-  silent_failure.py     compute silent-failure vs abstention metrics
-  wilson_intervals.py   compute Wilson 95% CIs for paper tables
-run.py            CLI
-tests/test_verify.py
-results/          stored evaluation corpus and extractions
+  wilson_intervals.py   # Wilson 95% score CIs for all reported rates
+  silent_failure.py     # Yield / silent-failure breakdown per corpus
+data/ (manifests)       # Corpus manifests with publication dates
+verdicts/               # Per-claim verdict records (JSONL, resumable)
+tests/                  # 23 regression tests pinning the verifier fixes
+paper/main.tex          # Paper source
 ```
 
-## Design notes (honesty constraints)
+## Reproducing
 
-- API failure ≠ non-existence: NVD outages yield `UNVERIFIABLE`, never `FABRICATED`.
-- LLM/network errors are recorded in results, never silently dropped.
-- IoCs must appear verbatim in the source (after defang normalization) — a model
-  cannot legitimately "know" a hash the report doesn't state.
-- Raw corpus is persisted alongside results for full reproducibility.
-- The verifier only grounds verifiable claim types; narrative claims are out of
-  scope and the paper must say so.
+1. `pip install -r requirements.txt`
+2. Create a `.env` with your API key (`OPENROUTER_API_KEY=...`) — **never commit this file**.
+3. Extraction: provider-agnostic client (local Ollama or any OpenAI-compatible endpoint), fixed prompt, temperature 0.
+4. Verification: fully deterministic; results append to JSONL with resume support.
+5. **Re-verification tool** recomputes every number in the paper from stored extractions under revised rules *without re-invoking any model* — verifier refinement is cheap and auditable.
+6. `pytest` runs the regression suite.
+
+Every table number regenerates from stored verdicts; no model calls required.
+
+## Citation
+
+```bibtex
+@misc{threatlens2026,
+  author = {Tusar, Shiddarth Dey},
+  title  = {ThreatLens: Claim-Level Grounding Verification for LLM-Extracted Cyber Threat Intelligence},
+  year   = {2026},
+  howpublished = {\url{https://github.com/ShiddarthDey/threatlens}}
+}
+```
+
+## Contact
+
+Shiddarth Dey Tusar — Charles Sturt University, NSW, Australia — tusardey77@gmail.com
