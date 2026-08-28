@@ -1,4 +1,4 @@
-﻿% ThreatLens — paper draft
+﻿﻿% ThreatLens — paper draft
 % Compiles with: pdflatex main && bibtex main && pdflatex main && pdflatex main
 % Uses only standard packages (no acmart/IEEEtran required).
 % To switch to ACM format for CAMLIS/AISec: replace the documentclass block
@@ -272,26 +272,26 @@ negative control on every re-verification.
 \label{sec:results}
 
 \begin{table}[t]
-\centering\small
+\centering\footnotesize
 \caption{Grounding verdicts by model and corpus. \textsc{Cisa} = narrative
 advisories (inference required); \textsc{Misp} = indicator lists (copying).
 Hallucination rate $=$ (fabricated $+$ ungrounded $+$ mislabeled) $/$
 verifiable claims, reported with Wilson 95\% CIs.}
 \label{tab:main}
 \setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{llrrrr}
+\begin{tabular}{@{}llrrl@{}}
 \toprule
-Model & Corpus & Runs & Claims & Halluc. Rate & 95\% CI \\
+Model & Corpus & Runs & Claims & Halluc.\ Rate [95\% CI] \\
 \midrule
-Nemotron-3-Super 120B & \textsc{misp} & 6   & 739 & \bf 0.00\% & [0.00\%, 0.52\%] \\
-Nemotron-3-Super 120B & \textsc{cisa} & 143 & 590 & \bf 6.39\% & [4.65\%, 8.73\%] \\
-gpt-oss-20B           & \textsc{misp} & 1   & 42  & \bf 0.00\% & [0.00\%, 8.38\%] \\
-gpt-oss-20B           & \textsc{cisa} & 39  & 113 & \bf 23.71\% & [16.35\%, 33.07\%] \\
-Gemma-4 31B           & \textsc{misp} & 1   & 39  & 0.00\% & [0.00\%, 8.97\%] \\
-Nemotron-nano 9B      & \textsc{cisa} & 5   & 7   & 0.00\% & [0.00\%, 35.43\%] \\
-Nemotron-3-nano 30B   & \textsc{cisa} & 10  & 0   & --- & --- \\
+Nemotron-3-Super 120B & \textsc{misp} & 6   & 739 & \bf 0.00\%\ [0.00\%, 0.52\%] \\
+Nemotron-3-Super 120B & \textsc{cisa} & 143 & 590 & \bf 6.39\%\ [4.65\%, 8.73\%] \\
+gpt-oss-20B           & \textsc{misp} & 1   & 42  & \bf 0.00\%\ [0.00\%, 8.38\%] \\
+gpt-oss-20B           & \textsc{cisa} & 39  & 113 & \bf 23.71\%\ [16.35\%, 33.07\%] \\
+Gemma-4 31B           & \textsc{misp} & 1   & 39  & 0.00\%\ [0.00\%, 8.97\%] \\
+Nemotron-nano 9B      & \textsc{cisa} & 5   & 7   & 0.00\%\ [0.00\%, 35.43\%] \\
+Nemotron-3-nano 30B   & \textsc{cisa} & 10  & 0   & --- \\
 \midrule
-Negative control      & \textsc{misp} & 1   & 8   & 87.50\% & [52.91\%, 97.76\%] \\
+Negative control      & \textsc{misp} & 1   & 8   & 87.50\%\ [52.91\%, 97.76\%] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -309,24 +309,24 @@ transfer to the narrative reports analysts actually triage.
 \subsection{Silent failure is invisible to precision metrics}
 \label{sec:silent}
 
-\begin{table}[t]
+\begin{table*}
 \centering\footnotesize
 \caption{Yield analysis over CVE-bearing advisories with Wilson 95\% CIs. \emph{Silent failure} =
-well-formed but empty extraction from a report containing CVEs;
-\emph{abstention} = empty extraction from a report with none.}
+well-formed but empty extraction from a report containing CVEs; \emph{abstention} = empty
+extraction from a report with none.}
 \label{tab:silent}
-\setlength{\tabcolsep}{2.5pt}
-\begin{tabular}{lrrrr}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}lllll@{}}
 \toprule
 Model & Runs & Yield [95\% CI] & Silent [95\% CI] & Abstain [95\% CI] \\
 \midrule
-Nemotron-3-Super 120B & 143 & 86.7\% [80.2\%, 91.3\%] & \bf 11.2\% [7.0\%, 17.4\%] & 2.1\% [0.7\%, 6.0\%] \\
-gpt-oss-20B           & 39  & 97.4\% [86.8\%, 99.5\%] & 2.6\% [0.5\%, 13.2\%]     & 0.0\% [0.0\%, 9.0\%] \\
-Nemotron-nano 9B      & 5   & 80.0\% [37.6\%, 96.4\%] & 0.0\% [0.0\%, 43.4\%]    & 20.0\% [3.6\%, 62.4\%] \\
-Nemotron-3-nano 30B   & 10  & 0.0\% [0.0\%, 27.8\%]   & \bf 100.0\% [72.2\%, 100.0\%] & 0.0\% [0.0\%, 27.8\%] \\
+Nemotron-3-Super 120B & 143 & 86.7\%\ [80.2\%, 91.3\%]  & \bf 11.2\%\ [7.0\%, 17.4\%]    & 2.1\%\ [0.7\%, 6.0\%] \\
+gpt-oss-20B           & 39  & 97.4\%\ [86.8\%, 99.5\%]  & 2.6\%\ [0.5\%, 13.2\%]          & 0.0\%\ [0.0\%, 9.0\%] \\
+Nemotron-nano 9B      & 5   & 80.0\%\ [37.6\%, 96.4\%]  & 0.0\%\ [0.0\%, 43.4\%]          & 20.0\%\ [3.6\%, 62.4\%] \\
+Nemotron-3-nano 30B   & 10  & 0.0\%\ [0.0\%, 27.8\%]    & \bf 100.0\%\ [72.2\%, 100.0\%]  & 0.0\%\ [0.0\%, 27.8\%] \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 Nemotron-3-nano 30B returned syntactically valid JSON containing empty arrays
 on \emph{every} successful run ($100.0\%$ [95\% CI: $72.2\%, 100.0\%$]). Its hallucination rate is undefined because it
