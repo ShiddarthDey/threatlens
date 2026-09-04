@@ -1,0 +1,14 @@
+{
+  "title": "ThreatLens: Claim-Level Grounding Verification for LLM-Extracted Cyber Threat Intelligence",
+  "description": "Code, corpus manifests, and per-claim verdicts for ThreatLens, an open-source pipeline that performs deterministic, claim-level grounding verification of LLM-extracted cyber threat intelligence against the National Vulnerability Database, MITRE ATT&CK STIX data, and the source document itself. Evaluated on five open-weight models over 94 post-cutoff CISA advisories. Paper PDF is available in the repository and as a linked Zenodo record.",
+  "creators": [
+    {
+      "name": "Tusar, Shiddarth Dey",
+      "affiliation": "Charles Sturt University",
+      "orcid": "0009-0003-1446-9408"
+    }
+  ],
+  "keywords": ["cyber threat intelligence", "large language models", "hallucination", "claim verification", "NVD", "MITRE ATT&CK"],
+  "license": "MIT",
+  "upload_type": "software"
+}
